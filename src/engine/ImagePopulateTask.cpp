@@ -59,6 +59,30 @@ IsAborted(const volatile bool* abortFlag)
 }
 
 
+// Isolata dalla ricorsione di CopyRecursive apposta: un buffer da 64KB come
+// variabile locale di una funzione ricorsiva moltiplica per la profondita'
+// di annidamento delle cartelle, esaurendo in fretta lo stack (limitato) del
+// thread worker. Tenendolo in una funzione non ricorsiva, ogni copia di file
+// costa 64KB una volta sola, non una volta per livello di annidamento.
+static status_t
+CopyFileContents(BFile& sourceFile, BFile& destFile,
+	const volatile bool* abortFlag)
+{
+	char buffer[65536];
+	ssize_t bytesRead;
+	while ((bytesRead = sourceFile.Read(buffer, sizeof(buffer))) > 0) {
+		if (IsAborted(abortFlag))
+			return kCanceled;
+
+		ssize_t bytesWritten = destFile.Write(buffer, bytesRead);
+		if (bytesWritten != bytesRead)
+			return B_IO_ERROR;
+	}
+
+	return B_OK;
+}
+
+
 static status_t
 CopyRecursive(BEntry& source, BDirectory& destParent,
 	const volatile bool* abortFlag)
@@ -103,16 +127,9 @@ CopyRecursive(BEntry& source, BDirectory& destParent,
 		if (status != B_OK)
 			return status;
 
-		char buffer[65536];
-		ssize_t bytesRead;
-		while ((bytesRead = sourceFile.Read(buffer, sizeof(buffer))) > 0) {
-			if (IsAborted(abortFlag))
-				return kCanceled;
-
-			ssize_t bytesWritten = destFile.Write(buffer, bytesRead);
-			if (bytesWritten != bytesRead)
-				return B_IO_ERROR;
-		}
+		status = CopyFileContents(sourceFile, destFile, abortFlag);
+		if (status != B_OK)
+			return status;
 
 		CopyAttributes(sourceFile, destFile);
 	}
