@@ -5,71 +5,73 @@ SubDirHdrs $(SUBDIR)/src/ui ;
 SubDirHdrs $(SUBDIR)/src/engine ;
 SubDirHdrs $(SUBDIR)/src/util ;
 
+# Definiamo la cartella di output e ci assicuriamo che venga creata
+binDir = $(SUBDIR)/bin ;
+MkDir $(binDir) ;
+
 Main FricoBurner :
-	src/app/main.cpp
-	src/app/FricoBurnerApp.cpp
-	src/ui/MainWindow.cpp
-	src/ui/FileListView.cpp
-	src/ui/CapacityBarView.cpp
-	src/ui/MediaPresetMenu.cpp
-	src/ui/BurnerDeviceMenu.cpp
-	src/ui/ProgressPanel.cpp
-	src/ui/DiscCopyPanel.cpp
-	src/ui/SaveImagePanel.cpp
-	src/ui/AboutWindow.cpp
-	src/ui/KofiButton.cpp
-	src/engine/BurnEngine.cpp
-	src/engine/ScanTask.cpp
-	src/engine/ImageProvisionTask.cpp
-	src/engine/ImagePopulateTask.cpp
-	src/engine/BackendCapabilities.cpp
-	src/engine/BurnTask.cpp
-	src/engine/DiscCopyTask.cpp
-	src/util/SizeEstimator.cpp
-	src/util/ExternalProcess.cpp
-	src/util/ExternalProcessLineReader.cpp
-	src/util/TempImageRegistry.cpp
-	;
+    src/app/main.cpp
+    src/app/FricoBurnerApp.cpp
+    src/ui/MainWindow.cpp
+    src/ui/FileListView.cpp
+    src/ui/CapacityBarView.cpp
+    src/ui/MediaPresetMenu.cpp
+    src/ui/BurnerDeviceMenu.cpp
+    src/ui/ProgressPanel.cpp
+    src/ui/DiscCopyPanel.cpp
+    src/ui/SaveImagePanel.cpp
+    src/ui/AboutWindow.cpp
+    src/ui/KofiButton.cpp
+    src/engine/BurnEngine.cpp
+    src/engine/ScanTask.cpp
+    src/engine/ImageProvisionTask.cpp
+    src/engine/ImagePopulateTask.cpp
+    src/engine/BackendCapabilities.cpp
+    src/engine/BurnTask.cpp
+    src/engine/DiscCopyTask.cpp
+    src/util/SizeEstimator.cpp
+    src/util/ExternalProcess.cpp
+    src/util/ExternalProcessLineReader.cpp
+    src/util/TempImageRegistry.cpp
+    ;
 
 LINKLIBS on FricoBurner += -lbe -ltranslation -ltracker -lstdc++ ;
-
-LOCATE on FricoBurner = $(SUBDIR)/bin ;
+LOCATE on FricoBurner = $(binDir) ;
+Depends FricoBurner : $(binDir) ;
 
 # Tool di test CLI, indipendente dalla UI (Milestone 3).
 Main test_scan :
-	src/test/test_scan.cpp
-	src/engine/ScanTask.cpp
-	src/util/SizeEstimator.cpp
-	;
+    src/test/test_scan.cpp
+    src/engine/ScanTask.cpp
+    src/util/SizeEstimator.cpp
+    ;
 
 LINKLIBS on test_scan += -lbe -lstdc++ ;
+LOCATE on test_scan = $(binDir) ;
+Depends test_scan : $(binDir) ;
 
-LOCATE on test_scan = $(SUBDIR)/bin ;
-
-# Tool di test CLI per il motore immagine BFS, indipendente dalla UI
-# (Milestone 4).
+# Tool di test CLI per il motore immagine BFS, indipendente dalla UI (Milestone 4).
 Main test_image_engine :
-	src/test/test_image_engine.cpp
-	src/engine/ImageProvisionTask.cpp
-	src/engine/ImagePopulateTask.cpp
-	src/util/ExternalProcess.cpp
-	;
+    src/test/test_image_engine.cpp
+    src/engine/ImageProvisionTask.cpp
+    src/engine/ImagePopulateTask.cpp
+    src/util/ExternalProcess.cpp
+    ;
 
 LINKLIBS on test_image_engine += -lbe -lstdc++ ;
+LOCATE on test_image_engine = $(binDir) ;
+Depends test_image_engine : $(binDir) ;
 
-LOCATE on test_image_engine = $(SUBDIR)/bin ;
-
-# Tool di test CLI per il backend di masterizzazione, indipendente dalla UI
-# (Milestone 6).
+# Tool di test CLI per il backend di masterizzazione, indipendente dalla UI (Milestone 6).
 Main test_backend :
-	src/test/test_backend.cpp
-	src/engine/BackendCapabilities.cpp
-	src/engine/BurnTask.cpp
-	src/engine/DiscCopyTask.cpp
-	src/util/ExternalProcess.cpp
-	src/util/ExternalProcessLineReader.cpp
-	;
+    src/test/test_backend.cpp
+    src/engine/BackendCapabilities.cpp
+    src/engine/BurnTask.cpp
+    src/engine/DiscCopyTask.cpp
+    src/util/ExternalProcess.cpp
+    src/util/ExternalProcessLineReader.cpp
+    ;
 
 LINKLIBS on test_backend += -lbe -lstdc++ ;
-
-LOCATE on test_backend = $(SUBDIR)/bin ;
+LOCATE on test_backend = $(binDir) ;
+Depends test_backend : $(binDir) ;
