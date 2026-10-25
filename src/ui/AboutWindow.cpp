@@ -4,6 +4,7 @@
  */
 
 #include "AboutWindow.h"
+#include "KofiButton.h"
 
 #include <Application.h>
 #include <Entry.h>
@@ -14,13 +15,16 @@
 #include <TranslationUtils.h>
 
 
-// Risolve il path dell'immagine mascotte a partire dalla posizione
+static const char* kKofiUrl = "https://ko-fi.com/U6U8R7FFN";
+
+
+// Risolve il path di un'immagine in resources/ a partire dalla posizione
 // dell'eseguibile: .../FricoBurner/bin/FricoBurner -> .../FricoBurner/
-// resources/mascot_pirate.png. Funziona finche' l'app gira dalla cartella
-// di sviluppo; andra' rivisto quando l'app verra' impacchettata (risorse
-// .rdef, vedi struttura di progetto nel piano).
+// resources/<name>. Funziona finche' l'app gira dalla cartella di sviluppo;
+// andra' rivisto quando l'app verra' impacchettata (risorse .rdef, vedi
+// struttura di progetto nel piano).
 static BPath
-MascotImagePath()
+ResourcePath(const char* name)
 {
 	app_info info;
 	be_app->GetAppInfo(&info);
@@ -35,8 +39,10 @@ MascotImagePath()
 	BPath projectRoot;
 	binDir.GetParent(&projectRoot);
 
-	projectRoot.Append("resources/mascot_pirate.png");
-	return projectRoot;
+	BPath resourcePath(projectRoot);
+	resourcePath.Append("resources");
+	resourcePath.Append(name);
+	return resourcePath;
 }
 
 
@@ -95,7 +101,7 @@ AboutWindow::AboutWindow()
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BBitmap* mascotBitmap = BTranslationUtils::GetBitmap(
-		MascotImagePath().Path());
+		ResourcePath("mascot_pirate.png").Path());
 
 	MascotView* mascot = new MascotView(mascotBitmap);
 
@@ -107,6 +113,10 @@ AboutWindow::AboutWindow()
 
 	BStringView* version = new BStringView("version", "Versione 0.1 (sviluppo)");
 
+	BBitmap* kofiBitmap = BTranslationUtils::GetBitmap(
+		ResourcePath("kofi_button.webp").Path());
+	KofiButton* kofiButton = new KofiButton(kofiBitmap, kKofiUrl);
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 8)
 		.SetInsets(16, 16, 16, 16)
 		.AddGroup(B_HORIZONTAL, 8)
@@ -117,6 +127,10 @@ AboutWindow::AboutWindow()
 				.Add(version)
 				.AddGlue()
 			.End()
+		.End()
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(kofiButton)
+			.AddGlue()
 		.End()
 		.AddGlue();
 }

@@ -17,6 +17,7 @@ Main FricoBurner :
 	src/ui/DiscCopyPanel.cpp
 	src/ui/SaveImagePanel.cpp
 	src/ui/AboutWindow.cpp
+	src/ui/KofiButton.cpp
 	src/engine/BurnEngine.cpp
 	src/engine/ScanTask.cpp
 	src/engine/ImageProvisionTask.cpp
